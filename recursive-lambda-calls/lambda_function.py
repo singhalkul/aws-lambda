@@ -1,6 +1,10 @@
+import json
 import boto3
 
 COUNTER = 'COUNTER'
+# Initialize any time consuming operations like DB connections here
+# as AWS initialises a container once and reuses the same container if called within a particular time frame.
+# It will apply to our use case as we call the same Lambda again after the current one.
 s3 = boto3.resource('s3')
 source_bucket = s3.Bucket('source-bucket')
 dest_bucket = s3.Bucket('dest-bucket')
@@ -28,7 +32,7 @@ def lambda_handler(event, context):
 
 
 def _make_recursive_call(event, context, counter):
-    event[COUNTER] = counter
+    event[COUNTER] = counter  # the event object can be used to pass state for the subsequent lambda invocations
     lambda_client = boto3.client('lambda')
     lambda_client.invoke(FunctionName=context.function_name, InvocationType='Event', Payload=json.dumps(event))
     return
