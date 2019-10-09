@@ -1,11 +1,9 @@
-import json
-
 import boto3
 
 COUNTER = 'COUNTER'
 s3 = boto3.resource('s3')
-source_bucket = s3.Bucket('test-aws-lambda-s3')
-dest_bucket = s3.Bucket('bsa-artifacts')
+source_bucket = s3.Bucket('source-bucket')
+dest_bucket = s3.Bucket('dest-bucket')
 
 
 def lambda_handler(event, context):
@@ -38,7 +36,7 @@ def _make_recursive_call(event, context, counter):
 
 def _process_item(item):
     # processing code goes here
-    # print(item.key)
+    # below code is for illustration only. There are better ways to copy S3 objects from one bucket to other.
     dest_object = s3.Object(dest_bucket.name, item.key)
     dest_object.copy_from(CopySource={
         'Bucket': source_bucket.name,
